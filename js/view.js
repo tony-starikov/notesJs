@@ -15,6 +15,10 @@ class View extends EventEmitter {
     return this.activeNotesList.querySelector(`[data-id="${id}"]`);
   }
 
+  findArchivedListItem(id) {
+    return this.archiveNotesList.querySelector(`[data-id="${id}"]`);
+  }
+
   createElement(note) {
     const createdAt = createElement(
       "h6",
@@ -192,9 +196,9 @@ class View extends EventEmitter {
 
   addEventListeners(note, archived) {
     if (archived) {
-      // const unarchiveButton = note.querySelector("button.unarchive");
+      const unarchiveButton = note.querySelector("button.unarchive");
 
-      // unarchiveButton.addEventListener("click", this.handleUnarchive.bind(this));
+      unarchiveButton.addEventListener("click", this.handleUnarchive.bind(this));
     } else {
       const archiveButton = note.querySelector("button.archive");
       const editButton = note.querySelector("button.edit");
@@ -230,6 +234,15 @@ class View extends EventEmitter {
     this.emit("archive", { id, archived });
   }
 
+  handleUnarchive({ target }) {
+    const noteItem = target.parentNode.parentNode.parentNode;
+    const id = noteItem.dataset.id;
+    const archived = false;
+
+    // update model
+    this.emit("unarchive", { id, archived });
+  }
+
   addItem(note) {
     const noteItem = this.createElement(note);
 
@@ -247,10 +260,24 @@ class View extends EventEmitter {
     this.archiveNotesList.appendChild(noteItem);
   }
 
+  unarchiveItem(note) {
+    this.removeArchivedItem(note.id);
+
+    const noteItem = this.createElement(note);
+
+    this.activeNotesList.appendChild(noteItem);
+  }
+
   removeItem(id) {
     const listItem = this.findListItem(id);
 
     this.activeNotesList.removeChild(listItem);
+  }
+
+  removeArchivedItem(id) {
+    const listItem = this.findArchivedListItem(id);
+
+    this.archiveNotesList.removeChild(listItem);
   }
 }
 

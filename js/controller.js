@@ -5,6 +5,7 @@ class Controller {
 
     view.on("add", this.addNote.bind(this));
     view.on('archive', this.archiveNote.bind(this));
+    view.on('unarchive', this.unarchiveNote.bind(this));
   }
 
   addNote({content, category}) {
@@ -27,6 +28,12 @@ class Controller {
     const note = this.model.updateItem(id, { archived });
 
     this.view.archiveItem(note);
+  }
+
+  unarchiveNote({id, archived}) {
+    const note = this.model.updateItem(id, { archived });
+
+    this.view.unarchiveItem(note);
   }
 }
 
