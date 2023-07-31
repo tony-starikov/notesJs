@@ -206,7 +206,7 @@ class View extends EventEmitter {
 
       archiveButton.addEventListener("click", this.handleArchive.bind(this));
       // editButton.addEventListener("click", this.handleEdit.bind(this));
-      // removeButton.addEventListener("click", this.handleRemove.bind(this));
+      removeButton.addEventListener("click", this.handleRemove.bind(this));
     }
 
     return note;
@@ -241,6 +241,14 @@ class View extends EventEmitter {
 
     // update model
     this.emit("unarchive", { id, archived });
+  }
+
+  handleRemove({ target }) {
+    const noteItem = target.parentNode.parentNode.parentNode;
+    const id = noteItem.dataset.id;
+
+    // update model
+    this.emit("remove", id);
   }
 
   addItem(note) {
