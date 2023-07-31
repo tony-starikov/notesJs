@@ -11,6 +11,10 @@ class View extends EventEmitter {
     this.form.addEventListener("submit", this.handleAdd.bind(this));
   }
 
+  findListItem(id) {
+    return this.activeNotesList.querySelector(`[data-id="${id}"]`);
+  }
+
   createElement(note) {
     const createdAt = createElement(
       "h6",
@@ -104,17 +108,102 @@ class View extends EventEmitter {
       card
     );
 
-    return this.addEventListeners(noteCol);
+    return this.addEventListeners(noteCol, note.archived);
   }
 
-  addEventListeners(note) {
-    const archiveButton = note.querySelector("button.archive");
-    const editButton = note.querySelector("button.edit");
-    const removeButton = note.querySelector("button.remove");
+  createArchivedElement(note) {
+    const createdAt = createElement(
+      "h6",
+      { className: "text-muted small" },
+      `Created: ${note.createdAt}`
+    );
+    const category = createElement(
+      "h6",
+      { className: "text-muted small" },
+      `Category: ${note.category}`
+    );
+    const content = createElement(
+      "p",
+      { className: "card-text" },
+      note.content
+    );
 
-    // archiveButton.addEventListener("click", this.handleArchive.bind(this));
-    // editButton.addEventListener("click", this.handleEdit.bind(this));
-    // removeButton.addEventListener("click", this.handleRemove.bind(this));
+    const datesList = createElement("ul", {
+      className: "list-group list-group-flush",
+    });
+
+    if (note.dates) {
+      const dateHeader = createElement(
+        "li",
+        { className: "list-group-item h6" },
+        "Important dates:"
+      );
+      datesList.appendChild(dateHeader);
+
+      note.dates.forEach((date) => {
+        const dateItem = createElement(
+          "li",
+          { className: "list-group-item" },
+          date
+        );
+        datesList.appendChild(dateItem);
+      });
+    }
+
+    const cardBody = createElement(
+      "div",
+      { className: "card-body" },
+      createdAt,
+      category,
+      content,
+      datesList
+    );
+
+    const unarchiveButton = createElement(
+      "button",
+      { className: "btn btn-primary unarchive", type: "button" },
+      "Unarchive"
+    );
+
+    const cardFooter = createElement(
+      "div",
+      { className: "card-footer" },
+      unarchiveButton
+    );
+
+    const card = createElement(
+      "div",
+      { className: "card h-100" },
+      cardBody,
+      cardFooter
+    );
+
+    const noteCol = createElement(
+      "div",
+      {
+        className: "col",
+        "data-id": note.id,
+      },
+      card
+    );
+
+    return this.addEventListeners(noteCol, note.archived);
+  }
+
+  addEventListeners(note, archived) {
+    if (archived) {
+      // const unarchiveButton = note.querySelector("button.unarchive");
+
+      // unarchiveButton.addEventListener("click", this.handleUnarchive.bind(this));
+    } else {
+      const archiveButton = note.querySelector("button.archive");
+      const editButton = note.querySelector("button.edit");
+      const removeButton = note.querySelector("button.remove");
+
+      archiveButton.addEventListener("click", this.handleArchive.bind(this));
+      // editButton.addEventListener("click", this.handleEdit.bind(this));
+      // removeButton.addEventListener("click", this.handleRemove.bind(this));
+    }
 
     return note;
   }
@@ -132,6 +221,15 @@ class View extends EventEmitter {
     this.emit("add", { content, category });
   }
 
+  handleArchive({ target }) {
+    const noteItem = target.parentNode.parentNode.parentNode;
+    const id = noteItem.dataset.id;
+    const archived = true;
+
+    // update model
+    this.emit("archive", { id, archived });
+  }
+
   addItem(note) {
     const noteItem = this.createElement(note);
 
@@ -139,6 +237,20 @@ class View extends EventEmitter {
     this.noteCategory.value = "Task";
 
     this.activeNotesList.appendChild(noteItem);
+  }
+
+  archiveItem(note) {
+    this.removeItem(note.id);
+
+    const noteItem = this.createArchivedElement(note);
+
+    this.archiveNotesList.appendChild(noteItem);
+  }
+
+  removeItem(id) {
+    const listItem = this.findListItem(id);
+
+    this.activeNotesList.removeChild(listItem);
   }
 }
 
