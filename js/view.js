@@ -32,12 +32,17 @@ class View extends EventEmitter {
     );
     const content = createElement(
       "p",
-      { className: "card-text" },
+      { className: "card-text content" },
       note.content
     );
 
+    const textfield = createElement("textarea", {
+      className: "form-control textfield d-none",
+      rows: "3",
+    });
+
     const datesList = createElement("ul", {
-      className: "list-group list-group-flush",
+      className: "list-group list-group-flush dates",
     });
 
     if (note.dates) {
@@ -64,6 +69,7 @@ class View extends EventEmitter {
       createdAt,
       category,
       content,
+      textfield,
       datesList
     );
 
@@ -198,14 +204,17 @@ class View extends EventEmitter {
     if (archived) {
       const unarchiveButton = note.querySelector("button.unarchive");
 
-      unarchiveButton.addEventListener("click", this.handleUnarchive.bind(this));
+      unarchiveButton.addEventListener(
+        "click",
+        this.handleUnarchive.bind(this)
+      );
     } else {
       const archiveButton = note.querySelector("button.archive");
       const editButton = note.querySelector("button.edit");
       const removeButton = note.querySelector("button.remove");
 
       archiveButton.addEventListener("click", this.handleArchive.bind(this));
-      // editButton.addEventListener("click", this.handleEdit.bind(this));
+      editButton.addEventListener("click", this.handleEdit.bind(this));
       removeButton.addEventListener("click", this.handleRemove.bind(this));
     }
 
@@ -251,6 +260,31 @@ class View extends EventEmitter {
     this.emit("remove", id);
   }
 
+  handleEdit({ target }) {
+    const noteItem = target.parentNode.parentNode.parentNode;
+    const id = noteItem.dataset.id;
+    const note = noteItem.querySelector("p.content");
+    const input = noteItem.querySelector(".textfield");
+    const editButton = noteItem.querySelector("button.edit");
+    const archiveButton = noteItem.querySelector("button.archive");
+    const removeButton = noteItem.querySelector("button.remove");
+    const content = input.value;
+    removeButton.classList.toggle("d-none");
+    archiveButton.classList.toggle("d-none");
+    input.classList.toggle("d-none");
+    note.classList.toggle("d-none");
+    const isEditing = noteItem.classList.contains("editing");
+
+    if (isEditing) {
+      // update model
+      this.emit("edit", { id, content });
+    } else {
+      input.value = note.textContent;
+      editButton.textContent = "Save";
+      noteItem.classList.add("editing");
+    }
+  }
+
   addItem(note) {
     const noteItem = this.createElement(note);
 
@@ -286,6 +320,30 @@ class View extends EventEmitter {
     const listItem = this.findArchivedListItem(id);
 
     this.archiveNotesList.removeChild(listItem);
+  }
+
+  editItem(note) {
+    const noteItem = this.findListItem(note.id);
+    const content = noteItem.querySelector("p.content");
+    const editButton = noteItem.querySelector("button.edit");
+    const datesUl = noteItem.querySelector("ul.dates");
+
+    content.textContent = note.content;
+    datesUl.innerHTML = "";
+
+    if (note.dates) {
+      note.dates.forEach((date) => {
+        const dateItem = createElement(
+          "li",
+          { className: "list-group-item" },
+          date
+        );
+        datesUl.appendChild(dateItem);
+      });
+    }
+
+    editButton.textContent = "Edit";
+    noteItem.classList.remove("editing");
   }
 }
 

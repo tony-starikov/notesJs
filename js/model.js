@@ -18,6 +18,10 @@ class Model {
 
     Object.keys(data).forEach((prop) => (item[prop] = data[prop]));
 
+    const dates = this.findDates(item.content);
+
+    item.dates = dates;
+
     return item;
   }
 
