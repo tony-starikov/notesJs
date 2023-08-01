@@ -4,16 +4,16 @@ class Controller {
     this.view = view;
 
     view.on("add", this.addNote.bind(this));
-    view.on('archive', this.archiveNote.bind(this));
-    view.on('unarchive', this.unarchiveNote.bind(this));
-    view.on('remove', this.removeNote.bind(this));
-    view.on('edit', this.editNote.bind(this));
+    view.on("archive", this.archiveNote.bind(this));
+    view.on("unarchive", this.unarchiveNote.bind(this));
+    view.on("remove", this.removeNote.bind(this));
+    view.on("edit", this.editNote.bind(this));
 
     view.show(this.model.state);
     view.countItems(this.model.countItems());
   }
 
-  addNote({content, category}) {
+  addNote({ content, category }) {
     const dates = this.model.findDates(content);
     const currentDate = this.model.getDate();
 
@@ -31,7 +31,7 @@ class Controller {
     this.view.addItem(note);
   }
 
-  archiveNote({id, archived}) {
+  archiveNote({ id, archived }) {
     const note = this.model.updateItem(id, { archived });
 
     this.countNotes();
@@ -39,7 +39,7 @@ class Controller {
     this.view.archiveItem(note);
   }
 
-  unarchiveNote({id, archived}) {
+  unarchiveNote({ id, archived }) {
     const note = this.model.updateItem(id, { archived });
 
     this.countNotes();
@@ -55,7 +55,7 @@ class Controller {
     this.view.removeItem(id);
   }
 
-  editNote({id, content}) {
+  editNote({ id, content }) {
     const note = this.model.updateItem(id, { content });
 
     this.countNotes();
@@ -66,7 +66,7 @@ class Controller {
   countNotes() {
     let count;
     try {
-      count = this.model.countItem();
+      count = this.model.countItems();
     } catch {
       alert("model error");
     }
