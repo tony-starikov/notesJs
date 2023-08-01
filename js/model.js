@@ -46,6 +46,38 @@ class Model {
     const date = new Date();
     return date.toDateString();
   }
+
+  countItems() {
+    const count = {
+      task: {
+        active: 0,
+        archived: 0,
+      },
+      idea: {
+        active: 0,
+        archived: 0,
+      },
+      random: {
+        active: 0,
+        archived: 0,
+      },
+    };
+
+    const result = this.state.reduce((accumulator, item) => {
+      if (item.category == "Task") {
+        item.archived ? accumulator.task.archived++ : accumulator.task.active++;
+      } else if (item.category == "Idea") {
+        item.archived ? accumulator.idea.archived++ : accumulator.idea.active++;
+      } else {
+        item.archived
+          ? accumulator.random.archived++
+          : accumulator.random.active++;
+      }
+      return accumulator;
+    }, count);
+
+    return result;
+  }
 }
 
 export default Model;

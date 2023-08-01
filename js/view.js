@@ -8,6 +8,10 @@ class View extends EventEmitter {
     this.activeNotesList = document.getElementById("activeNotesList");
     this.archiveNotesList = document.getElementById("archiveNotesList");
 
+    this.countTask = document.getElementById("count-task");
+    this.countRandom = document.getElementById("count-random");
+    this.countIdea = document.getElementById("count-idea");
+
     this.form.addEventListener("submit", this.handleAdd.bind(this));
   }
 
@@ -358,6 +362,12 @@ class View extends EventEmitter {
 
       this.activeNotesList.appendChild(listItem);
     });
+  }
+
+  countItems({task, idea, random}) {
+    this.countTask.textContent = `Task | Active: ${task.active} | Archived: ${task.archived}`;
+    this.countRandom.textContent = `Random Thought | Active: ${random.active} | Archived: ${random.archived}`;
+    this.countIdea.textContent = `Idea | Active: ${idea.active} | Archived: ${idea.archived}`;
   }
 }
 

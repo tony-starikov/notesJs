@@ -9,7 +9,8 @@ class Controller {
     view.on('remove', this.removeNote.bind(this));
     view.on('edit', this.editNote.bind(this));
 
-    view.show(model.state);
+    view.show(this.model.state);
+    view.countItems(this.model.countItems());
   }
 
   addNote({content, category}) {
@@ -25,11 +26,15 @@ class Controller {
       archived: false,
     });
 
+    this.countNotes();
+
     this.view.addItem(note);
   }
 
   archiveNote({id, archived}) {
     const note = this.model.updateItem(id, { archived });
+
+    this.countNotes();
 
     this.view.archiveItem(note);
   }
@@ -37,11 +42,15 @@ class Controller {
   unarchiveNote({id, archived}) {
     const note = this.model.updateItem(id, { archived });
 
+    this.countNotes();
+
     this.view.unarchiveItem(note);
   }
 
   removeNote(id) {
     this.model.removeItem(id);
+
+    this.countNotes();
 
     this.view.removeItem(id);
   }
@@ -49,7 +58,20 @@ class Controller {
   editNote({id, content}) {
     const note = this.model.updateItem(id, { content });
 
+    this.countNotes();
+
     this.view.editItem(note);
+  }
+
+  countNotes() {
+    let count;
+    try {
+      count = this.model.countItem();
+    } catch {
+      alert("model error");
+    }
+    
+    this.view.countItems(count);
   }
 }
 
