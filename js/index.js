@@ -1,5 +1,6 @@
 import Model from "./model.js";
 import View from "./view.js";
+import UI from "./ui.js";
 import Controller from "./controller.js";
 
 const currentDate = new Date();
@@ -66,6 +67,7 @@ const state = [
   },
 ];
 
+const ui = new UI();
 const model = new Model(state);
-const view = new View();
+const view = new View(ui);
 const controller = new Controller(model, view);

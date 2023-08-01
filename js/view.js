@@ -1,7 +1,8 @@
 import { createElement, EventEmitter } from "./helpers.js";
 class View extends EventEmitter {
-  constructor() {
+  constructor(ui) {
     super();
+    this.ui = ui;
     this.form = document.getElementById("noteForm");
     this.noteContent = document.getElementById("noteContent");
     this.noteCategory = document.getElementById("noteCategory");
@@ -24,182 +25,13 @@ class View extends EventEmitter {
   }
 
   createElement(note) {
-    const createdAt = createElement(
-      "h6",
-      { className: "text-muted small" },
-      `Created: ${note.createdAt}`
-    );
-    const category = createElement(
-      "h6",
-      { className: "text-muted small" },
-      `Category: ${note.category}`
-    );
-    const content = createElement(
-      "p",
-      { className: "card-text content" },
-      note.content
-    );
-
-    const textfield = createElement("textarea", {
-      className: "form-control textfield d-none",
-      rows: "3",
-    });
-
-    const datesList = createElement("ul", {
-      className: "list-group list-group-flush dates",
-    });
-
-    if (note.dates) {
-      const dateHeader = createElement(
-        "li",
-        { className: "list-group-item h6" },
-        "Important dates:"
-      );
-      datesList.appendChild(dateHeader);
-
-      note.dates.forEach((date) => {
-        const dateItem = createElement(
-          "li",
-          { className: "list-group-item" },
-          date
-        );
-        datesList.appendChild(dateItem);
-      });
-    }
-
-    const cardBody = createElement(
-      "div",
-      { className: "card-body" },
-      createdAt,
-      category,
-      content,
-      textfield,
-      datesList
-    );
-
-    const editButton = createElement(
-      "button",
-      { className: "btn btn-primary edit", type: "button" },
-      "Edit"
-    );
-    const removeButton = createElement(
-      "button",
-      { className: "btn btn-primary remove", type: "button" },
-      "Delete"
-    );
-    const archiveButton = createElement(
-      "button",
-      { className: "btn btn-primary archive", type: "button" },
-      "Archive"
-    );
-
-    const whiteSpace1 = document.createTextNode("\u00A0");
-    const whiteSpace2 = document.createTextNode("\u00A0");
-
-    const cardFooter = createElement(
-      "div",
-      { className: "card-footer" },
-      editButton,
-      whiteSpace1,
-      removeButton,
-      whiteSpace2,
-      archiveButton
-    );
-
-    const card = createElement(
-      "div",
-      { className: "card h-100" },
-      cardBody,
-      cardFooter
-    );
-
-    const noteCol = createElement(
-      "div",
-      {
-        className: "col",
-        "data-id": note.id,
-      },
-      card
-    );
+    const noteCol = this.ui.createUiElement(note);
 
     return this.addEventListeners(noteCol, note.archived);
   }
 
   createArchivedElement(note) {
-    const createdAt = createElement(
-      "h6",
-      { className: "text-muted small" },
-      `Created: ${note.createdAt}`
-    );
-    const category = createElement(
-      "h6",
-      { className: "text-muted small" },
-      `Category: ${note.category}`
-    );
-    const content = createElement(
-      "p",
-      { className: "card-text" },
-      note.content
-    );
-
-    const datesList = createElement("ul", {
-      className: "list-group list-group-flush",
-    });
-
-    if (note.dates) {
-      const dateHeader = createElement(
-        "li",
-        { className: "list-group-item h6" },
-        "Important dates:"
-      );
-      datesList.appendChild(dateHeader);
-
-      note.dates.forEach((date) => {
-        const dateItem = createElement(
-          "li",
-          { className: "list-group-item" },
-          date
-        );
-        datesList.appendChild(dateItem);
-      });
-    }
-
-    const cardBody = createElement(
-      "div",
-      { className: "card-body" },
-      createdAt,
-      category,
-      content,
-      datesList
-    );
-
-    const unarchiveButton = createElement(
-      "button",
-      { className: "btn btn-primary unarchive", type: "button" },
-      "Unarchive"
-    );
-
-    const cardFooter = createElement(
-      "div",
-      { className: "card-footer" },
-      unarchiveButton
-    );
-
-    const card = createElement(
-      "div",
-      { className: "card h-100" },
-      cardBody,
-      cardFooter
-    );
-
-    const noteCol = createElement(
-      "div",
-      {
-        className: "col",
-        "data-id": note.id,
-      },
-      card
-    );
+    const noteCol = this.ui.createUiArchivedElement(note);
 
     return this.addEventListeners(noteCol, note.archived);
   }
@@ -335,22 +167,7 @@ class View extends EventEmitter {
     content.textContent = note.content;
     datesUl.innerHTML = "";
 
-    if (note.dates) {
-      const dateHeader = createElement(
-        "li",
-        { className: "list-group-item h6" },
-        "Important dates:"
-      );
-      datesUl.appendChild(dateHeader);
-      note.dates.forEach((date) => {
-        const dateItem = createElement(
-          "li",
-          { className: "list-group-item" },
-          date
-        );
-        datesUl.appendChild(dateItem);
-      });
-    }
+    this.ui.createUiDates(datesUl, note);
 
     editButton.textContent = "Edit";
     noteItem.classList.remove("editing");
@@ -364,7 +181,7 @@ class View extends EventEmitter {
     });
   }
 
-  countItems({task, idea, random}) {
+  countItems({ task, idea, random }) {
     this.countTask.textContent = `Task | Active: ${task.active} | Archived: ${task.archived}`;
     this.countRandom.textContent = `Random Thought | Active: ${random.active} | Archived: ${random.archived}`;
     this.countIdea.textContent = `Idea | Active: ${idea.active} | Archived: ${idea.archived}`;
