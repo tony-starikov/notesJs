@@ -332,6 +332,12 @@ class View extends EventEmitter {
     datesUl.innerHTML = "";
 
     if (note.dates) {
+      const dateHeader = createElement(
+        "li",
+        { className: "list-group-item h6" },
+        "Important dates:"
+      );
+      datesUl.appendChild(dateHeader);
       note.dates.forEach((date) => {
         const dateItem = createElement(
           "li",
@@ -344,6 +350,14 @@ class View extends EventEmitter {
 
     editButton.textContent = "Edit";
     noteItem.classList.remove("editing");
+  }
+
+  show(notes) {
+    notes.forEach((note) => {
+      const listItem = this.createElement(note);
+
+      this.activeNotesList.appendChild(listItem);
+    });
   }
 }
 

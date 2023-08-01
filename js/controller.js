@@ -8,6 +8,8 @@ class Controller {
     view.on('unarchive', this.unarchiveNote.bind(this));
     view.on('remove', this.removeNote.bind(this));
     view.on('edit', this.editNote.bind(this));
+
+    view.show(model.state);
   }
 
   addNote({content, category}) {
